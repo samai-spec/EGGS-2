@@ -21,18 +21,21 @@ jobs:
           node-version: 22
 
       - name: 3. Install NPM Dependencies
+        working-directory: arish-eggs
         run: npm install
 
       - name: 4. Build Web Application
+        working-directory: arish-eggs
         run: npm run build
 
       - name: 5. Setup Capacitor & Generate Native Android Assets with Original Logo
+        working-directory: arish-eggs
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
           npx cap init "ARISH EGGS" "com.arisheggs.app" --web-dir dist
           npx cap add android
 
-          # Use original logo from public/logo.png for all app icon & splash screen assets
+          # تجهيز الأيقونة وشاشة البداية بصورتك الأصلية
           mkdir -p assets
           cp public/logo.png assets/icon-only.png
           cp public/logo.png assets/icon-foreground.png
@@ -41,10 +44,10 @@ jobs:
           cp public/logo.png assets/splash-dark.png
           cp public/logo.png assets/logo.png
 
-          # Generate native mipmap icons and splash screens
+          # توليد أيقونات وشاشات الأندرويد تلقائياً
           npx @capacitor/assets generate --android || true
           
-          # Sync assets to Android native project
+          # مزامنة الملفات مع مجلد الأندرويد
           npx cap sync android
 
       - name: 6. Setup Java 21 JDK
@@ -57,8 +60,8 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: 8. Build Debug APK
+        working-directory: arish-eggs/android
         run: |
-          cd android
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
@@ -66,5 +69,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ARISH-EGGS-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: arish-eggs/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
