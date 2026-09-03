@@ -36,7 +36,7 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: 6. Replace Capacitor Icons with Your Original Logo Directly
+      - name: 6. Replace Capacitor Icons with Your Original Logo Safely
         working-directory: arish-eggs
         run: |
           # العثور على شعارك الأصلي
@@ -48,7 +48,10 @@ jobs:
 
           RES_DIR="android/app/src/main/res"
 
-          # استبدال أيقونة المكثف بشعارك الأصلي في جميع مجلدات الأندرويد بدقة
+          # 1. حذف مجلد anydpi-v26 الذي يحتوي على رمز المكثف الأزرق المائل لمنع تكرار الملفات
+          rm -rf "$RES_DIR/mipmap-anydpi-v26"
+
+          # 2. استبدال الأيقونات بصورتك الأصلية في كافة مجلدات الأندرويد
           for dir in "$RES_DIR"/mipmap-*; do
             if [ -d "$dir" ]; then
               echo "Replacing icons in: $dir"
@@ -58,7 +61,7 @@ jobs:
             fi
           done
 
-          # استبدال شاشات البداية (Splash Screens) بشعارك الأصلي أيضاً
+          # 3. استبدال شاشات البداية بشعارك الأصلي أيضاً
           for dir in "$RES_DIR"/drawable*; do
             if [ -d "$dir" ]; then
               if [ -f "$dir/splash.png" ]; then
