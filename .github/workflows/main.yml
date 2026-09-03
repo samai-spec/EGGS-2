@@ -1,0 +1,70 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 3. Install NPM Dependencies
+        run: npm install
+
+      - name: 4. Build Web Application
+        run: npm run build
+
+      - name: 5. Setup Capacitor & Generate Native Android Assets with Original Logo
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
+          npx cap init "ARISH EGGS" "com.arisheggs.app" --web-dir dist
+          npx cap add android
+
+          # Use original logo from public/logo.png for all app icon & splash screen assets
+          mkdir -p assets
+          cp public/logo.png assets/icon-only.png
+          cp public/logo.png assets/icon-foreground.png
+          cp public/logo.png assets/icon-background.png
+          cp public/logo.png assets/splash.png
+          cp public/logo.png assets/splash-dark.png
+          cp public/logo.png assets/logo.png
+
+          # Generate native mipmap icons and splash screens
+          npx @capacitor/assets generate --android || true
+          
+          # Sync assets to Android native project
+          npx cap sync android
+
+      - name: 6. Setup Java 21 JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: 7. Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 8. Build Debug APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+
+      - name: 9. Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARISH-EGGS-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
