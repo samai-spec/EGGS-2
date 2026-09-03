@@ -28,44 +28,61 @@ jobs:
         working-directory: arish-eggs
         run: npm run build
 
-      - name: 5. Setup Capacitor & Generate Native Android Assets with Original Logo
+      - name: 5. Setup Capacitor Android Project
         working-directory: arish-eggs
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "ARISH EGGS" "com.arisheggs.app" --web-dir dist
           npx cap add android
-
-          # تجهيز الأيقونة وشاشة البداية بصورتك الأصلية
-          mkdir -p assets
-          cp public/logo.png assets/icon-only.png
-          cp public/logo.png assets/icon-foreground.png
-          cp public/logo.png assets/icon-background.png
-          cp public/logo.png assets/splash.png
-          cp public/logo.png assets/splash-dark.png
-          cp public/logo.png assets/logo.png
-
-          # توليد أيقونات وشاشات الأندرويد تلقائياً
-          npx @capacitor/assets generate --android || true
-          
-          # مزامنة الملفات مع مجلد الأندرويد
           npx cap sync android
 
-      - name: 6. Setup Java 21 JDK
+      - name: 6. Replace Capacitor Icons with Your Original Logo Directly
+        working-directory: arish-eggs
+        run: |
+          # العثور على شعارك الأصلي
+          LOGO="public/logo.png"
+          if [ ! -f "$LOGO" ]; then
+            LOGO="public/icon.png"
+          fi
+          echo "Using logo from: $LOGO"
+
+          RES_DIR="android/app/src/main/res"
+
+          # استبدال أيقونة المكثف بشعارك الأصلي في جميع مجلدات الأندرويد بدقة
+          for dir in "$RES_DIR"/mipmap-*; do
+            if [ -d "$dir" ]; then
+              echo "Replacing icons in: $dir"
+              cp -f "$LOGO" "$dir/ic_launcher.png"
+              cp -f "$LOGO" "$dir/ic_launcher_round.png"
+              cp -f "$LOGO" "$dir/ic_launcher_foreground.png"
+            fi
+          done
+
+          # استبدال شاشات البداية (Splash Screens) بشعارك الأصلي أيضاً
+          for dir in "$RES_DIR"/drawable*; do
+            if [ -d "$dir" ]; then
+              if [ -f "$dir/splash.png" ]; then
+                cp -f "$LOGO" "$dir/splash.png"
+              fi
+            fi
+          done
+
+      - name: 7. Setup Java 21 JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '21'
 
-      - name: 7. Setup Android SDK
+      - name: 8. Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 8. Build Debug APK
+      - name: 9. Build Final Debug APK
         working-directory: arish-eggs/android
         run: |
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
-      - name: 9. Upload APK Artifact
+      - name: 10. Upload Final APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ARISH-EGGS-APK
