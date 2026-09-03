@@ -36,37 +36,45 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: 6. Replace Capacitor Icons with Your Original Logo Safely
+      - name: 6. Resize and Apply Original Logo into Android Adaptive & Standard Icons
         working-directory: arish-eggs
         run: |
-          # العثور على شعارك الأصلي
+          # تثبيت أداة معالجة الصور السريعة
+          npm install -g sharp-cli
+
           LOGO="public/logo.png"
           if [ ! -f "$LOGO" ]; then
             LOGO="public/icon.png"
           fi
           echo "Using logo from: $LOGO"
 
-          RES_DIR="android/app/src/main/res"
+          RES="android/app/src/main/res"
 
-          # 1. حذف مجلد anydpi-v26 الذي يحتوي على رمز المكثف الأزرق المائل لمنع تكرار الملفات
-          rm -rf "$RES_DIR/mipmap-anydpi-v26"
+          # 1. توليد الأيقونات العادية والدائرية بالمقاسات الرسمية لأندرويد
+          sharp -i "$LOGO" -o "$RES/mipmap-mdpi/ic_launcher.png" resize 48 48
+          sharp -i "$LOGO" -o "$RES/mipmap-mdpi/ic_launcher_round.png" resize 48 48
+          sharp -i "$LOGO" -o "$RES/mipmap-mdpi/ic_launcher_foreground.png" resize 108 108
 
-          # 2. استبدال الأيقونات بصورتك الأصلية في كافة مجلدات الأندرويد
-          for dir in "$RES_DIR"/mipmap-*; do
-            if [ -d "$dir" ]; then
-              echo "Replacing icons in: $dir"
-              cp -f "$LOGO" "$dir/ic_launcher.png"
-              cp -f "$LOGO" "$dir/ic_launcher_round.png"
-              cp -f "$LOGO" "$dir/ic_launcher_foreground.png"
-            fi
-          done
+          sharp -i "$LOGO" -o "$RES/mipmap-hdpi/ic_launcher.png" resize 72 72
+          sharp -i "$LOGO" -o "$RES/mipmap-hdpi/ic_launcher_round.png" resize 72 72
+          sharp -i "$LOGO" -o "$RES/mipmap-hdpi/ic_launcher_foreground.png" resize 162 162
 
-          # 3. استبدال شاشات البداية بشعارك الأصلي أيضاً
-          for dir in "$RES_DIR"/drawable*; do
-            if [ -d "$dir" ]; then
-              if [ -f "$dir/splash.png" ]; then
-                cp -f "$LOGO" "$dir/splash.png"
-              fi
+          sharp -i "$LOGO" -o "$RES/mipmap-xhdpi/ic_launcher.png" resize 96 96
+          sharp -i "$LOGO" -o "$RES/mipmap-xhdpi/ic_launcher_round.png" resize 96 96
+          sharp -i "$LOGO" -o "$RES/mipmap-xhdpi/ic_launcher_foreground.png" resize 216 216
+
+          sharp -i "$LOGO" -o "$RES/mipmap-xxhdpi/ic_launcher.png" resize 144 144
+          sharp -i "$LOGO" -o "$RES/mipmap-xxhdpi/ic_launcher_round.png" resize 144 144
+          sharp -i "$LOGO" -o "$RES/mipmap-xxhdpi/ic_launcher_foreground.png" resize 324 324
+
+          sharp -i "$LOGO" -o "$RES/mipmap-xxxhdpi/ic_launcher.png" resize 192 192
+          sharp -i "$LOGO" -o "$RES/mipmap-xxxhdpi/ic_launcher_round.png" resize 192 192
+          sharp -i "$LOGO" -o "$RES/mipmap-xxxhdpi/ic_launcher_foreground.png" resize 432 432
+
+          # 2. توليد شاشة البداية بحجم مناسب وخفيف
+          for dir in "$RES"/drawable*; do
+            if [ -d "$dir" ] && [ -f "$dir/splash.png" ]; then
+              sharp -i "$LOGO" -o "$dir/splash.png" resize 480 480 --fit contain
             fi
           done
 
