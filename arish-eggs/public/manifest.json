@@ -1,0 +1,29 @@
+{
+  "name": "ARISH EGGS - نظام إدارة مزارع وإنتاج البيض",
+  "short_name": "ARISH EGGS",
+  "description": "نظام إدارة مزارع الدواجن وإنتاج بيض المائدة والأعلاف والتقارير المالية - منتجات نهر اسطوان",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071228",
+  "theme_color": "#0D2149",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo_arish.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo_arish.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

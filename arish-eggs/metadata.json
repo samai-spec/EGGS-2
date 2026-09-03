@@ -1,0 +1,6 @@
+{
+  "name": "ARISH EGGS",
+  "description": "نظام شامل واحترافي لإدارة مزارع الدواجن وإنتاج بيض المائدة، تتبع استهلاك الأعلاف والمخزون، والتقارير المالية اليومية والمزامنة مع إكسل و OneDrive.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
